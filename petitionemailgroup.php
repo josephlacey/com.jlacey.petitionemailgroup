@@ -1,0 +1,172 @@
+<?php
+
+require_once 'petitionemailgroup.civix.php';
+use CRM_Petitionemailgroup_ExtensionUtil as E;
+
+/**
+ * Implements hook_civicrm_config().
+ *
+ * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_config
+ */
+function petitionemailgroup_civicrm_config(&$config) {
+  _petitionemailgroup_civix_civicrm_config($config);
+}
+
+/**
+ * Implements hook_civicrm_xmlMenu().
+ *
+ * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_xmlMenu
+ */
+function petitionemailgroup_civicrm_xmlMenu(&$files) {
+  _petitionemailgroup_civix_civicrm_xmlMenu($files);
+}
+
+/**
+ * Implements hook_civicrm_install().
+ *
+ * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_install
+ */
+function petitionemailgroup_civicrm_install() {
+  _petitionemailgroup_civix_civicrm_install();
+}
+
+/**
+ * Implements hook_civicrm_postInstall().
+ *
+ * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_postInstall
+ */
+function petitionemailgroup_civicrm_postInstall() {
+  _petitionemailgroup_civix_civicrm_postInstall();
+}
+
+/**
+ * Implements hook_civicrm_uninstall().
+ *
+ * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_uninstall
+ */
+function petitionemailgroup_civicrm_uninstall() {
+  _petitionemailgroup_civix_civicrm_uninstall();
+}
+
+/**
+ * Implements hook_civicrm_enable().
+ *
+ * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_enable
+ */
+function petitionemailgroup_civicrm_enable() {
+  _petitionemailgroup_civix_civicrm_enable();
+}
+
+/**
+ * Implements hook_civicrm_disable().
+ *
+ * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_disable
+ */
+function petitionemailgroup_civicrm_disable() {
+  _petitionemailgroup_civix_civicrm_disable();
+}
+
+/**
+ * Implements hook_civicrm_upgrade().
+ *
+ * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_upgrade
+ */
+function petitionemailgroup_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
+  return _petitionemailgroup_civix_civicrm_upgrade($op, $queue);
+}
+
+/**
+ * Implements hook_civicrm_managed().
+ *
+ * Generate a list of entities to create/deactivate/delete when this module
+ * is installed, disabled, uninstalled.
+ *
+ * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_managed
+ */
+function petitionemailgroup_civicrm_managed(&$entities) {
+  _petitionemailgroup_civix_civicrm_managed($entities);
+}
+
+/**
+ * Implements hook_civicrm_caseTypes().
+ *
+ * Generate a list of case-types.
+ *
+ * Note: This hook only runs in CiviCRM 4.4+.
+ *
+ * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_caseTypes
+ */
+function petitionemailgroup_civicrm_caseTypes(&$caseTypes) {
+  _petitionemailgroup_civix_civicrm_caseTypes($caseTypes);
+}
+
+/**
+ * Implements hook_civicrm_angularModules().
+ *
+ * Generate a list of Angular modules.
+ *
+ * Note: This hook only runs in CiviCRM 4.5+. It may
+ * use features only available in v4.6+.
+ *
+ * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_angularModules
+ */
+function petitionemailgroup_civicrm_angularModules(&$angularModules) {
+  _petitionemailgroup_civix_civicrm_angularModules($angularModules);
+}
+
+/**
+ * Implements hook_civicrm_alterSettingsFolders().
+ *
+ * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_alterSettingsFolders
+ */
+function petitionemailgroup_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
+  _petitionemailgroup_civix_civicrm_alterSettingsFolders($metaDataFolders);
+}
+
+/**
+ * Implements hook_civicrm_entityTypes().
+ *
+ * Declare entity types provided by this module.
+ *
+ * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_entityTypes
+ */
+function petitionemailgroup_civicrm_entityTypes(&$entityTypes) {
+  _petitionemailgroup_civix_civicrm_entityTypes($entityTypes);
+}
+
+/**
+ * Implements hook_civicrm_buildForm().
+ *
+ * @param string $formName
+ * @param CRM_Core_Form $form
+ *
+ * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_buildForm/
+ */
+function petitionemailgroup_civicrm_buildForm($formName, &$form) {
+  if ($formName == 'CRM_Custom_Form_CustomDataByType') {
+    CRM_Core_Resources::singleton()->addScriptFile('com.jlacey.petitionemailgroup', 'js/petitionemailgroup.js');
+  }
+}
+
+/**
+ * Implements hook_civicrm_fieldOptions().
+ *
+ * @param string $formName
+ * @param CRM_Core_Form $form
+ *
+ * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_buildForm/
+ */
+function petitionemailgroup_civicrm_fieldOptions($entity, $field, &$options, $params) {
+  if ($entity == 'Survey') {
+    
+    $recipientGroupId =  civicrm_api3('CustomField', 'getvalue', ['return' => "id",'name' => "Recipient_Group",]);
+    $fieldId = (int) substr($field, 7);
+
+    if ($fieldId == $recipientGroupId) { 
+      $groups =  civicrm_api3('Group', 'get', ['return' => ["title"],]);
+      foreach($groups['values'] as $groupId => $group) {
+        $options[$groupId] = $group['title'];
+      }
+    }
+  }
+}
