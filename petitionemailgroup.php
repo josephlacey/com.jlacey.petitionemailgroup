@@ -163,7 +163,7 @@ function petitionemailgroup_civicrm_fieldOptions($entity, $field, &$options, $pa
     $fieldId = (int) substr($field, 7);
 
     if ($fieldId == $recipientGroupId) { 
-      $groups =  civicrm_api3('Group', 'get', ['return' => ["title"],]);
+      $groups =  civicrm_api3('Group', 'get', 'return' => ["title"], 'options' => ['limit' => 999999],);
       foreach($groups['values'] as $groupId => $group) {
         $options[$groupId] = $group['title'];
       }
