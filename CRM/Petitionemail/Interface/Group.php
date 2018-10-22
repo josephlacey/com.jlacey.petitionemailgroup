@@ -54,29 +54,31 @@ class CRM_Petitionemail_Interface_Group extends CRM_Petitionemail_Interface {
       return;
     }
     $groupIdField = $this->fields['Recipient_Group'];
-    $groupId = $this->petitionEmailVal[$groupIdField];
-    $groupContacts = civicrm_api3('GroupContact', 'get', ['sequential' => 1,'return' => ["contact_id"],'group_id' => "$groupId",'options' => ['limit' => 999999],]);
+    $groupIds = $this->petitionEmailVal[$groupIdField];
+    foreach ($groupIds as $groupId) {
+      $groupContacts = civicrm_api3('GroupContact', 'get', ['sequential' => 1,'return' => ["contact_id"],'group_id' => "$groupId",'options' => ['limit' => 999999],]);
 
-    foreach ($groupContacts['values'] as $groupContact) {
-      $contact = civicrm_api3('Contact', 'getsingle', ['return' => ["display_name", "email"],'id' => $groupContact['contact_id'],]);
-      // Setup email message:
-      $mailParams = array(
-        'groupName' => 'Activity Email Sender',
-        'from' => $this->getSenderLine($form->_contactId),
-        'toName' => $contact['display_name'],
-        'toEmail' => $contact['email'],
-        'subject' => $this->petitionEmailVal[$this->fields['Support_Subject']],
-        'text' => $message,
-      );
+      foreach ($groupContacts['values'] as $groupContact) {
+        $contact = civicrm_api3('Contact', 'getsingle', ['return' => ["display_name", "email"],'id' => $groupContact['contact_id'],]);
+        // Setup email message:
+        $mailParams = array(
+          'groupName' => 'Activity Email Sender',
+          'from' => $this->getSenderLine($form->_contactId),
+          'toName' => $contact['display_name'],
+          'toEmail' => $contact['email'],
+          'subject' => $this->petitionEmailVal[$this->fields['Support_Subject']],
+          'text' => $message,
+        );
 
-      if (!CRM_Utils_Mail::send($mailParams)) {
-        CRM_Core_Session::setStatus(ts('Error sending message to %1', array('domain' => 'com.aghstrategies.petitionemail', 1 => $mailParams['toName'])));
+        if (!CRM_Utils_Mail::send($mailParams)) {
+          CRM_Core_Session::setStatus(ts('Error sending message to %1', array('domain' => 'com.aghstrategies.petitionemail', 1 => $mailParams['toName'])));
+        }
+        else {
+          CRM_Core_Session::setStatus(ts('Message sent successfully to %1', array('domain' => 'com.aghstrategies.petitionemail', 1 => $mailParams['toName'])));
+        }
+
+        parent::processSignature($form);
       }
-      else {
-        CRM_Core_Session::setStatus(ts('Message sent successfully to %1', array('domain' => 'com.aghstrategies.petitionemail', 1 => $mailParams['toName'])));
-      }
-
-      parent::processSignature($form);
     }
   }
 
