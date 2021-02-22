@@ -1,6 +1,6 @@
 # com.jlacey.petitionemailgroup
 
-This provide a Group field option to the Petition Email Recipient System list.
+This provides a Group field option to the Petition Email Recipient System list.
 
 The extension is licensed under [AGPL-3.0](LICENSE.txt).
 
